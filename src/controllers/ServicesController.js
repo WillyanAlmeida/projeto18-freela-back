@@ -41,7 +41,12 @@ export async function NewService(req, res) {
 export async function getServicesAll(req, res) {
     
     try {
-        const categoryList = await db.query(`SELECT *,services.id AS servid, services.name AS servicename, users.name AS username FROM services JOIN pictures ON "pictureMain" = pictures.id JOIN users ON services."createdBy" = users.id WHERE services.available = true`);
+        const categoryList = await db.query(`SELECT *,services.id AS servid, services.name AS servicename, users.name AS username
+        FROM services 
+        JOIN pictures ON "pictureMain" = pictures.id 
+        JOIN users ON services."createdBy" = users.id 
+        JOIN category ON services."categoryId" = category.id
+        WHERE services.available = true`);
              
         res.status(200).send( categoryList.rows);
     } catch (error) {
@@ -88,7 +93,7 @@ export async function getServiceId(req, res) {
     const id = Number(req.params.id); 
     
     try {
-        const ServicebyId = await db.query(`SELECT *, services.id AS servid, services.name AS servicename, users.name AS username FROM services JOIN pictures ON "pictureMain" = pictures.id JOIN users ON services."createdBy" = users.id WHERE services.id=$1`,[id]);
+        const ServicebyId = await db.query(`SELECT *, services.id AS servid, services.name AS servicename, users.name AS username FROM services JOIN pictures ON "pictureMain" = pictures.id JOIN users ON services."createdBy" = users.id  JOIN category ON services."categoryId" = category.id WHERE services.id=$1`,[id]);
              
         res.status(200).send( ServicebyId.rows[0]);
     } catch (error) {
