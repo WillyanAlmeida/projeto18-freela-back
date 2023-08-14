@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 
 
 export async function signup(req, res) {
-    const { name, email } = req.body
-    console.log(req.body)
+    const { name, email, city, phone, cpf, zipcode, picture  } = req.body
+    
 if(req.body.password != req.body.confirmPassword) return res.status(409).send("senha não confere");
     try {
         const user = await db.query(`SELECT * FROM users WHERE email=$1`, [email]);
@@ -13,8 +13,8 @@ if(req.body.password != req.body.confirmPassword) return res.status(409).send("s
 
         const passwordHashed = bcrypt.hashSync(req.body.password, 10);
         delete req.body.password;
-        const cad = await db.query(`INSERT INTO users ( name, email, password ) VALUES
-        ($1, $2, $3) RETURNING * `, [name, email, passwordHashed]);
+        const cad = await db.query(`INSERT INTO users ( name, email, password, city, phone, cpf, zipcode, picture ) VALUES
+        ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * `, [name, email, passwordHashed, city, phone, cpf, zipcode, picture]);
         
         res.sendStatus(201);
     } catch (error) {
@@ -43,7 +43,7 @@ export async function signin(req, res) {
         const token = jwt.sign(dados, chaveSecreta, { expiresIn: "1h" });
         console.log(token)
 
-        res.status(200).send( { token});
+        res.status(200).send( { token, id: user.rows[0].id, picture: user.rows[0].picture});
     }
     catch (error) {
         console.log(error);
